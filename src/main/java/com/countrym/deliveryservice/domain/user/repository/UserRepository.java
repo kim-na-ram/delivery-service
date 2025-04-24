@@ -11,8 +11,6 @@ import static com.countrym.deliveryservice.common.exception.ResponseCode.NOT_FOU
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
-    Optional<User> findById(long id);
-
     Optional<User> findByEmail(String email);
 
     default User findUserById(long id) {

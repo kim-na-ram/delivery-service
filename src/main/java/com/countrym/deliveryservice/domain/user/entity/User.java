@@ -1,5 +1,6 @@
 package com.countrym.deliveryservice.domain.user.entity;
 
+import com.countrym.deliveryservice.common.config.security.UserInfo;
 import com.countrym.deliveryservice.domain.auth.dto.request.SignUpRequestDto;
 import com.countrym.deliveryservice.domain.user.enums.Authority;
 import com.countrym.deliveryservice.domain.user.enums.Grade;
@@ -48,6 +49,14 @@ public class User {
     private LocalDateTime deletedAt;
 
     private User(
+            long id,
+            Authority authority
+    ) {
+        this.id = id;
+        this.authority = authority;
+    }
+
+    private User(
             String email,
             String password,
             String name,
@@ -62,6 +71,13 @@ public class User {
         this.authority = Authority.from(isOwner);
     }
 
+    public static User from(UserInfo userInfo) {
+        return new User(
+                userInfo.getId(),
+                userInfo.getAuthority()
+        );
+    }
+
     public static User from(SignUpRequestDto signUpRequestDto, String encodedPassword) {
         return new User(
                 signUpRequestDto.getEmail(),
@@ -72,8 +88,7 @@ public class User {
         );
     }
 
-    public static User deleteUser(User user) {
-        user.deletedAt = LocalDateTime.now();
-        return user;
+    public void deleteUser() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

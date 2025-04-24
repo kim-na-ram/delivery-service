@@ -70,12 +70,17 @@ public class AuthService {
             // 주문이 있다면 회원 탈퇴 불가능
             // 주문이 없다면 회원 탈퇴 후 가게 비활성화
 
-            userRepository.save(User.deleteUser(user));
+            deleteUser(user);
         } else {
             // TODO 주문이 있는지 확인 필요
             // 주문이 있다면 회원 탈퇴 불가능
             // 주문이 없다면 회원 탈퇴
-            userRepository.save(User.deleteUser(user));
+            deleteUser(user);
         }
+    }
+
+    private void deleteUser(User user) {
+        user.deleteUser();
+        userRepository.save(user);
     }
 }

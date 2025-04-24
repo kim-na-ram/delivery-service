@@ -15,9 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserInfo {
     private Long id;
+    private Authority authority;
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserInfo of(Long id, Authority authority) {
-        return new UserInfo(id, List.of(new SimpleGrantedAuthority(authority.name())));
+        return new UserInfo(id, authority, List.of(new SimpleGrantedAuthority(authority.name())));
     }
 }
