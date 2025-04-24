@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SuccessResponse<T> extends BaseResponse {
-    private T data;
+    private final T data;
 
     private SuccessResponse(T data) {
         super(HttpStatus.OK.value(), ResponseCode.SUCCESS.getMessage());
@@ -17,5 +17,9 @@ public class SuccessResponse<T> extends BaseResponse {
 
     public static <T> SuccessResponse<T> of(T data) {
         return new SuccessResponse<>(data);
+    }
+
+    public static SuccessResponse<Void> of() {
+        return new SuccessResponse<>(null);
     }
 }

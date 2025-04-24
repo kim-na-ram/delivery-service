@@ -10,6 +10,12 @@ public enum ResponseCode {
     INVALID_TIMEOUT("다시 시도해주세요."),
     FORBIDDEN("접근 권한이 없습니다."),
 
+    // auth
+    NOT_FOUND_USER("해당 사용자는 존재하지 않습니다."),
+    INVALID_EMAIL_OR_PASSWORD("이메일 혹은 비밀번호가 일치하지 않습니다."),
+    INVALID_PASSWORD("비밀번호가 일치하지 않습니다."),
+    INVALID_USER_AUTHORITY("유효하지 않은 사용자 권한입니다."),
+    ALREADY_SIGNED_EMAIL_ERROR("이미 가입된 이메일입니다."),
     ;
 
     private final String message;
