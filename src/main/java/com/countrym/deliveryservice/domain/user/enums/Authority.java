@@ -5,7 +5,7 @@ import com.countrym.deliveryservice.common.exception.InvalidParameterException;
 
 import java.util.Arrays;
 
-import static com.countrym.deliveryservice.common.exception.ResponseCode.INVALID_USER_AUTHORITY;
+import static com.countrym.deliveryservice.common.exception.ResponseCode.NOT_FOUND_USER_AUTHORITY;
 
 public enum Authority implements BaseEnum {
     USER("사용자"),
@@ -30,6 +30,6 @@ public enum Authority implements BaseEnum {
         return Arrays.stream(Authority.values())
                 .filter(r -> r.name().equalsIgnoreCase(role))
                 .findFirst()
-                .orElseThrow(() -> new InvalidParameterException(INVALID_USER_AUTHORITY));
+                .orElseThrow(() -> new InvalidParameterException(NOT_FOUND_USER_AUTHORITY));
     }
 }
