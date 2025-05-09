@@ -16,7 +16,13 @@ public enum ResponseCode {
     INVALID_EMAIL_OR_PASSWORD("이메일 혹은 비밀번호가 일치하지 않습니다."),
     INVALID_PASSWORD("비밀번호가 일치하지 않습니다."),
     ALREADY_SIGNED_EMAIL_ERROR("이미 가입된 이메일입니다."),
-    ;
+
+    // store
+    NOT_FOUND_STORE("해당 가게는 존재하지 않습니다."),
+    INVALID_USER_AUTHORITY("점주만이 가능한 기능입니다."),
+    INVALID_STORE_TYPE("유효하지 않은 가게 타입입니다."),
+    INVALID_STORE_OWNER("해당 가게의 점주가 아닙니다."),
+    ALREADY_EXISTS_STORE_ERROR("이미 존재하는 가게명입니다.");
 
     private final String message;
 }
