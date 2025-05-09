@@ -22,7 +22,11 @@ public enum ResponseCode {
     INVALID_USER_AUTHORITY("점주만이 가능한 기능입니다."),
     INVALID_STORE_TYPE("유효하지 않은 가게 타입입니다."),
     INVALID_STORE_OWNER("해당 가게의 점주가 아닙니다."),
-    ALREADY_EXISTS_STORE_ERROR("이미 존재하는 가게명입니다.");
+    ALREADY_EXISTS_STORE_ERROR("이미 존재하는 가게명입니다."),
+
+    // menu
+    NOT_FOUND_MENU("해당 메뉴는 존재하지 않습니다."),
+    ALREADY_EXISTS_MENU_ERROR("이미 존재하는 메뉴명입니다.");
 
     private final String message;
 }
