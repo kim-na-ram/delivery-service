@@ -11,6 +11,7 @@ import com.countrym.deliveryservice.domain.user.entity.User;
 import com.countrym.deliveryservice.domain.user.enums.Authority;
 import com.countrym.deliveryservice.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.countrym.deliveryservice.common.config.security.TokenConst.ACCESS_TOKEN_EXPIRE_TIME;
 import static com.countrym.deliveryservice.common.exception.ResponseCode.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -37,7 +39,7 @@ public class AuthService {
         userRepository.save(newUser);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public String signIn(SignInRequestDto signInRequestDto) {
         User user = userRepository.findByEmail(signInRequestDto.getEmail())
                 .orElseThrow(() -> new InvalidParameterException(INVALID_EMAIL_OR_PASSWORD));
@@ -52,7 +54,8 @@ public class AuthService {
     @Transactional
     public void signOut(
             UserInfo userInfo
-    ) {}
+    ) {
+    }
 
     @Transactional
     public void withdraw(

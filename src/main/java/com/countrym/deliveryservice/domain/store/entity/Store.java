@@ -1,5 +1,6 @@
 package com.countrym.deliveryservice.domain.store.entity;
 
+import com.countrym.deliveryservice.domain.menu.entity.Menu;
 import com.countrym.deliveryservice.domain.store.dto.request.ModifyStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.dto.request.RegisterStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.enums.StoreType;
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -28,6 +31,9 @@ public class Store {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @OneToMany(mappedBy = "store")
+    private List<Menu> menuList = new ArrayList<>();
 
     @NotBlank
     private String name;
@@ -114,7 +120,8 @@ public class Store {
         if (!modifyStoreRequestDto.getType().isBlank()) this.type = StoreType.of(modifyStoreRequestDto.getType());
         if (modifyStoreRequestDto.getOpenAt() != null) this.openAt = modifyStoreRequestDto.getOpenAt();
         if (modifyStoreRequestDto.getClosedAt() != null) this.closedAt = modifyStoreRequestDto.getClosedAt();
-        if (modifyStoreRequestDto.getMinOrderPrice() != null) this.minOrderPrice = modifyStoreRequestDto.getMinOrderPrice();
+        if (modifyStoreRequestDto.getMinOrderPrice() != null)
+            this.minOrderPrice = modifyStoreRequestDto.getMinOrderPrice();
     }
 
     public void closure() {

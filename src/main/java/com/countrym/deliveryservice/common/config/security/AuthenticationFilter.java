@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -31,8 +32,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         String url = request.getRequestURI();
+        String method = request.getMethod();
 
-        if (!url.isBlank() && !isExcludePath(url)) {
+        if (!url.isBlank() && !isExcludePath(url, method)) {
             // 그 외에는 토큰 체크
             String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -61,10 +63,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isExcludePath(String path) {
+    private boolean isExcludePath(String path, String method) {
         return path.startsWith("/swagger-ui/") ||
                 path.equals("/api/auth/sign-up") ||
                 path.equals("/api/auth/sign-in") ||
+                (path.startsWith("/api/stores") && method.equals(HttpMethod.GET.toString())) ||
                 path.matches("^/api-docs(/.*)?$");
     }
 }
