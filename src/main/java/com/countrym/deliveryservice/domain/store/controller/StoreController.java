@@ -49,7 +49,7 @@ public class StoreController {
     public ResponseEntity<SuccessResponse<List<GetStoreListResponseDto>>> getStoreList(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String name,
-            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(size = 20, sort = "id") Pageable pageable
     ) {
         return ResponseEntity.ok(SuccessResponse.of(storeService.getStoreList(type, name, pageable)));
     }

@@ -47,7 +47,7 @@ public class StoreService {
 
     @Transactional(readOnly = true)
     public List<GetStoreListResponseDto> getStoreList(String type, String name, Pageable pageable) {
-        return storeRepository.findAllByTypeAndName(
+        return storeRepository.findAllByTypeAndNameByPaging(
                 StringUtils.hasText(type) ? StoreType.of(type) : null,
                 name,
                 pageable
