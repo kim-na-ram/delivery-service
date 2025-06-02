@@ -98,6 +98,14 @@ public class Store {
         this.reviewAmount = 0;
     }
 
+    private Store(long storeId) {
+        this.id = storeId;
+    }
+
+    public static Store of(long storeId) {
+        return new Store(storeId);
+    }
+
     public static Store from(User user, RegisterStoreRequestDto registerStoreRequestDto) {
         return new Store(
                 user,

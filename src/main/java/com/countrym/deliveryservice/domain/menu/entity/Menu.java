@@ -1,5 +1,7 @@
 package com.countrym.deliveryservice.domain.menu.entity;
 
+import com.countrym.deliveryservice.domain.menu.dto.projection.StoreOwnerMenuDto;
+import com.countrym.deliveryservice.domain.menu.dto.request.ModifyMenuRequestDto;
 import com.countrym.deliveryservice.domain.menu.dto.request.RegisterMenuRequestDto;
 import com.countrym.deliveryservice.domain.store.entity.Store;
 import jakarta.persistence.*;
@@ -9,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -50,6 +53,15 @@ public class Menu {
         this.price = price;
     }
 
+    private Menu(long id, String name, String thumbnailUrl, String details, int price, Store store) {
+        this.id = id;
+        this.name = name;
+        this.thumbnailUrl = thumbnailUrl;
+        this.details = details;
+        this.price = price;
+        this.store = store;
+    }
+
     public static Menu from(Store store, RegisterMenuRequestDto registerMenuRequestDto) {
         return new Menu(
                 store,
@@ -58,6 +70,24 @@ public class Menu {
                 registerMenuRequestDto.getDetails(),
                 registerMenuRequestDto.getPrice()
         );
+    }
+
+    public static Menu from(StoreOwnerMenuDto storeOwnerMenuDto) {
+        return new Menu(
+                storeOwnerMenuDto.getMenuId(),
+                storeOwnerMenuDto.getName(),
+                storeOwnerMenuDto.getThumbnailUrl(),
+                storeOwnerMenuDto.getDetails(),
+                storeOwnerMenuDto.getPrice(),
+                Store.of(storeOwnerMenuDto.getStoreId())
+        );
+    }
+
+    public void modify(ModifyMenuRequestDto modifyMenuRequestDto) {
+        if (StringUtils.hasText(modifyMenuRequestDto.getName())) this.name = modifyMenuRequestDto.getName();
+        if (StringUtils.hasText(modifyMenuRequestDto.getDetails())) this.details = modifyMenuRequestDto.getDetails();
+        if (modifyMenuRequestDto.getPrice() != null)
+            this.price = modifyMenuRequestDto.getPrice();
     }
 
     public void delete() {

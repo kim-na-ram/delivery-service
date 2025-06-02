@@ -13,7 +13,6 @@ import com.countrym.deliveryservice.domain.store.entity.Store;
 import com.countrym.deliveryservice.domain.store.enums.StoreType;
 import com.countrym.deliveryservice.domain.store.repository.StoreRepository;
 import com.countrym.deliveryservice.domain.user.entity.User;
-import com.countrym.deliveryservice.domain.user.enums.Authority;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static com.countrym.deliveryservice.common.exception.ResponseCode.*;
+import static com.countrym.deliveryservice.common.exception.ResponseCode.ALREADY_EXISTS_STORE_ERROR;
+import static com.countrym.deliveryservice.common.exception.ResponseCode.INVALID_STORE_OWNER;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,6 @@ public class StoreService {
 
     @Transactional
     public RegisterStoreResponseDto registerStore(UserInfo userInfo, RegisterStoreRequestDto registerStoreRequestDto) {
-        validateUserAuthority(userInfo.getAuthority());
         validateStoreName(registerStoreRequestDto.getName());
 
         Store store = storeRepository.save(Store.from(User.from(userInfo), registerStoreRequestDto));
@@ -56,8 +55,6 @@ public class StoreService {
 
     @Transactional
     public ModifyStoreResponseDto modifyStore(long storeId, UserInfo userInfo, ModifyStoreRequestDto modifyStoreRequestDto) {
-        validateUserAuthority(userInfo.getAuthority());
-
         Store store = storeRepository.findByStoreId(storeId);
         validateUserOwnStore(userInfo.getId(), store);
 
@@ -68,12 +65,6 @@ public class StoreService {
         storeRepository.save(store);
 
         return ModifyStoreResponseDto.from(store);
-    }
-
-    private void validateUserAuthority(Authority authority) {
-        if (!authority.equals(Authority.OWNER)) {
-            throw new InvalidParameterException(INVALID_USER_AUTHORITY);
-        }
     }
 
     private void validateUserOwnStore(long userId, Store store) {
@@ -89,8 +80,6 @@ public class StoreService {
 
     @Transactional
     public void closureStore(long storeId, UserInfo userInfo) {
-        validateUserAuthority(userInfo.getAuthority());
-
         Store store = storeRepository.findByStoreId(storeId);
         validateUserOwnStore(userInfo.getId(), store);
 

@@ -26,6 +26,7 @@ public enum ResponseCode {
 
     // menu
     NOT_FOUND_MENU("해당 메뉴는 존재하지 않습니다."),
+    NOT_FOUND_STORE_MENU("해당 가게에 존재하지 않는 메뉴입니다."),
     ALREADY_EXISTS_MENU_ERROR("이미 존재하는 메뉴명입니다.");
 
     private final String message;

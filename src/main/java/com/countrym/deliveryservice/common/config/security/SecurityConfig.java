@@ -1,5 +1,6 @@
 package com.countrym.deliveryservice.common.config.security;
 
+import com.countrym.deliveryservice.domain.user.enums.Authority;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +37,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/sign-up").permitAll()
                         .requestMatchers("/api/auth/sign-in").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
+                        .requestMatchers(
+                                "/api/stores",
+                                "/api/stores/**",
+                                "api/stores/*/menu",
+                                "api/stores/*/menu/**")
+                        .hasAnyAuthority(Authority.OWNER.name())
                         .anyRequest().authenticated()
                 )
                 .build();
