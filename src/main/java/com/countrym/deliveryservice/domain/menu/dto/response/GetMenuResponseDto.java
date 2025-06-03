@@ -1,5 +1,6 @@
 package com.countrym.deliveryservice.domain.menu.dto.response;
 
+import com.countrym.deliveryservice.domain.menu.dto.projection.MenuDto;
 import com.countrym.deliveryservice.domain.menu.entity.Menu;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,16 @@ public class GetMenuResponseDto {
     public static GetMenuResponseDto from(Menu menu) {
         return new GetMenuResponseDto(
                 menu.getId(),
+                menu.getName(),
+                menu.getThumbnailUrl(),
+                menu.getDetails(),
+                menu.getPrice()
+        );
+    }
+
+    public static GetMenuResponseDto from(MenuDto menu) {
+        return new GetMenuResponseDto(
+                menu.getMenuId(),
                 menu.getName(),
                 menu.getThumbnailUrl(),
                 menu.getDetails(),

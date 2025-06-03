@@ -1,5 +1,6 @@
 package com.countrym.deliveryservice.domain.data.menu;
 
+import com.countrym.deliveryservice.domain.menu.dto.projection.MenuDto;
 import com.countrym.deliveryservice.domain.menu.dto.request.RegisterMenuRequestDto;
 import com.countrym.deliveryservice.domain.menu.entity.Menu;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -42,6 +43,25 @@ public class MenuMockData {
         List<Menu> menuList = new ArrayList<>();
         for (int i = 1; i <= number; i++) {
             menuList.add(getMenu(i));
+        }
+        return menuList;
+    }
+
+    public static MenuDto getMenuDto(int number) {
+        MenuDto menuDto = new MenuDto(
+                Integer.valueOf(number).longValue(),
+                "name",
+                null,
+                null,
+                10000
+        );
+        return menuDto;
+    }
+
+    public static List<MenuDto> getMenuDtoList(int number) {
+        List<MenuDto> menuList = new ArrayList<>();
+        for (int i = 1; i <= number; i++) {
+            menuList.add(getMenuDto(i));
         }
         return menuList;
     }

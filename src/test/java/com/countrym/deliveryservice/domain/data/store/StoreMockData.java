@@ -1,18 +1,17 @@
 package com.countrym.deliveryservice.domain.data.store;
 
 import com.countrym.deliveryservice.common.config.security.UserInfo;
+import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.request.ModifyStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.dto.request.RegisterStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.entity.Store;
 import com.countrym.deliveryservice.domain.store.enums.StoreType;
 import com.countrym.deliveryservice.domain.user.entity.User;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalTime;
-import java.util.List;
 
-import static com.countrym.deliveryservice.domain.data.menu.MenuMockData.getMenu;
+import static com.countrym.deliveryservice.domain.data.menu.MenuMockData.getMenuDtoList;
 import static com.countrym.deliveryservice.domain.data.menu.MenuMockData.getMenuList;
 import static com.countrym.deliveryservice.domain.data.user.UserMockData.getOwnerInfo;
 
@@ -35,9 +34,9 @@ public class StoreMockData {
         return new ModifyStoreRequestDto(
                 "modify name",
                 "thumbnailUrl",
-                "details",
-                "address1",
-                "address2",
+                null,
+                null,
+                null,
                 StoreType.CAFE.name(),
                 LocalTime.of(11, 0),
                 LocalTime.of(22, 0),
@@ -72,5 +71,21 @@ public class StoreMockData {
         ReflectionTestUtils.setField(store, "menuList", getMenuList(5));
 
         return store;
+    }
+
+    public static StoreMenuListDto getStoreMenuListDto(int number) {
+        return new StoreMenuListDto(
+                "name",
+                null,
+                "details",
+                "address1",
+                "address2",
+                LocalTime.of(10, 0),
+                LocalTime.of(20, 0),
+                10000,
+                5.0,
+                3,
+                getMenuDtoList(number)
+        );
     }
 }

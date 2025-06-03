@@ -3,6 +3,7 @@ package com.countrym.deliveryservice.domain.store.service;
 import com.countrym.deliveryservice.common.config.security.UserInfo;
 import com.countrym.deliveryservice.common.exception.DuplicateElementException;
 import com.countrym.deliveryservice.common.exception.InvalidParameterException;
+import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.request.ModifyStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.dto.request.RegisterStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.dto.response.GetStoreListResponseDto;
@@ -40,8 +41,8 @@ public class StoreService {
 
     @Transactional(readOnly = true)
     public GetStoreResponseDto getStore(long storeId) {
-        Store store = storeRepository.findByStoreId(storeId);
-        return GetStoreResponseDto.from(store);
+        StoreMenuListDto storeMenuListDto = storeRepository.findByStoreIdWithMenuList(storeId);
+        return GetStoreResponseDto.from(storeMenuListDto);
     }
 
     @Transactional(readOnly = true)
@@ -58,8 +59,10 @@ public class StoreService {
         Store store = storeRepository.findByStoreId(storeId);
         validateUserOwnStore(userInfo.getId(), store);
 
-        if (!store.getName().equals(modifyStoreRequestDto.getName()))
-            validateStoreName(store.getName());
+        if (StringUtils.hasText(modifyStoreRequestDto.getName())) {
+            if (!store.getName().equals(modifyStoreRequestDto.getName()))
+                validateStoreName(modifyStoreRequestDto.getName());
+        }
 
         store.modify(modifyStoreRequestDto);
         storeRepository.save(store);

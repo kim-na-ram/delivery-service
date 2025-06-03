@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -121,11 +122,14 @@ public class Store {
     }
 
     public void modify(ModifyStoreRequestDto modifyStoreRequestDto) {
-        if (!modifyStoreRequestDto.getName().isBlank()) this.name = modifyStoreRequestDto.getName();
-        if (!modifyStoreRequestDto.getDetails().isBlank()) this.details = modifyStoreRequestDto.getDetails();
-        if (!modifyStoreRequestDto.getAddress1().isBlank()) this.address1 = modifyStoreRequestDto.getAddress1();
-        if (!modifyStoreRequestDto.getAddress2().isBlank()) this.address2 = modifyStoreRequestDto.getAddress2();
-        if (!modifyStoreRequestDto.getType().isBlank()) this.type = StoreType.of(modifyStoreRequestDto.getType());
+        if (StringUtils.hasText(modifyStoreRequestDto.getName())) this.name = modifyStoreRequestDto.getName();
+        if (StringUtils.hasText(modifyStoreRequestDto.getDetails())) this.details = modifyStoreRequestDto.getDetails();
+        if (StringUtils.hasText(modifyStoreRequestDto.getAddress1()))
+            this.address1 = modifyStoreRequestDto.getAddress1();
+        if (StringUtils.hasText(modifyStoreRequestDto.getAddress2()))
+            this.address2 = modifyStoreRequestDto.getAddress2();
+        if (StringUtils.hasText(modifyStoreRequestDto.getType()))
+            this.type = StoreType.of(modifyStoreRequestDto.getType());
         if (modifyStoreRequestDto.getOpenAt() != null) this.openAt = modifyStoreRequestDto.getOpenAt();
         if (modifyStoreRequestDto.getClosedAt() != null) this.closedAt = modifyStoreRequestDto.getClosedAt();
         if (modifyStoreRequestDto.getMinOrderPrice() != null)

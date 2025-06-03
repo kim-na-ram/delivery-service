@@ -1,6 +1,9 @@
 package com.countrym.deliveryservice.domain.store.repository;
 
 import com.countrym.deliveryservice.common.config.spring.JPAConfig;
+import com.countrym.deliveryservice.domain.menu.entity.Menu;
+import com.countrym.deliveryservice.domain.menu.repository.MenuRepository;
+import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.response.GetStoreListResponseDto;
 import com.countrym.deliveryservice.domain.store.entity.Store;
 import com.countrym.deliveryservice.domain.store.enums.StoreSortType;
@@ -8,15 +11,17 @@ import com.countrym.deliveryservice.domain.store.enums.StoreType;
 import com.countrym.deliveryservice.domain.user.entity.User;
 import com.countrym.deliveryservice.domain.user.repository.UserRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -24,16 +29,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.countrym.deliveryservice.domain.data.menu.MenuMockData.getRegisterMenuRequestDto;
 import static com.countrym.deliveryservice.domain.data.store.StoreMockData.getRegisterStoreRequestDto;
 import static com.countrym.deliveryservice.domain.data.user.UserMockData.getOwnerSignUpRequestDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @Import(JPAConfig.class)
 @ExtendWith(SpringExtension.class)
 class StoreRepositoryTest {
-    private static final Logger log = LoggerFactory.getLogger(StoreRepositoryTest.class);
-
     @Autowired
     private JPAQueryFactory jpaQueryFactory;
 
@@ -43,9 +48,69 @@ class StoreRepositoryTest {
     @Autowired
     private StoreRepository storeRepository;
 
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Nested
+    @DisplayName("가게 조회")
+    public class findStore {
+        private final int listSize = 5;
+        private long storeId;
+        private List<Menu> menuList;
+
+        @BeforeEach
+        public void setup() {
+            User owner = User.from(getOwnerSignUpRequestDto(), "owner123");
+            userRepository.save(owner);
+
+            Store store = Store.from(owner, getRegisterStoreRequestDto());
+            storeId = storeRepository.save(store).getId();
+
+            menuList = new ArrayList<>();
+            for (int i = 1; i <= listSize; i++) {
+                Menu menu = Menu.from(store, getRegisterMenuRequestDto());
+                ReflectionTestUtils.setField(menu, "name", "menu " + i);
+                ReflectionTestUtils.setField(menu, "price", new Random().nextInt(1000, 15001));
+
+                menuList.add(menu);
+            }
+
+            menuRepository.saveAll(menuList);
+        }
+
+        @Test
+        @DisplayName("가게와 메뉴 목록 표시 성공")
+        public void findStoreWithMenuList() {
+            // given
+
+            // when
+            StoreMenuListDto storeMenuListDto = storeRepository.findByStoreIdWithMenuList(storeId);
+
+            // then
+            assertNotNull(storeMenuListDto);
+            assertEquals(menuList.size(), storeMenuListDto.getMenuList().size());
+        }
+
+        @Test
+        @DisplayName("삭제된 메뉴는 가게 조회할 때 표시되지 않음")
+        public void findStore_deletedMenuIsNotDisplayed() {
+            // given
+            // 삭제한 메뉴
+            Menu deleteMenu = menuList.get(0);
+            deleteMenu.delete();
+            menuRepository.save(deleteMenu);
+
+            // when
+            StoreMenuListDto storeMenuListDto = storeRepository.findByStoreIdWithMenuList(storeId);
+
+            // then
+            assertNotNull(storeMenuListDto);
+            assertTrue(storeMenuListDto.getMenuList().stream().noneMatch(menuDto -> menuDto.getMenuId().equals(deleteMenu.getId())));
+        }
+    }
+
     @Nested
     @DisplayName("가게 목록 조회")
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     public class findStoreList {
         private final int listSize = 40;
         private List<Store> storeList;
