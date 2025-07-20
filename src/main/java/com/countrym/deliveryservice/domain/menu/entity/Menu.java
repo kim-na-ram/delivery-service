@@ -37,6 +37,7 @@ public class Menu {
     @Column(name = "price")
     private int price;
 
+    @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
     @Column(name = "details")
@@ -44,6 +45,10 @@ public class Menu {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    private Menu(long id) {
+        this.id = id;
+    }
 
     private Menu(Store store, String name, String thumbnailUrl, String details, int price) {
         this.store = store;
@@ -60,6 +65,10 @@ public class Menu {
         this.details = details;
         this.price = price;
         this.store = store;
+    }
+
+    public static Menu of(long id) {
+        return new Menu(id);
     }
 
     public static Menu from(Store store, RegisterMenuRequestDto registerMenuRequestDto) {

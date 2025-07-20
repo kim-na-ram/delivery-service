@@ -67,7 +67,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return path.startsWith("/swagger-ui/") ||
                 path.equals("/api/auth/sign-up") ||
                 path.equals("/api/auth/sign-in") ||
-                (path.startsWith("/api/stores") && method.equals(HttpMethod.GET.toString())) ||
+                (path.matches("^api/stores(?:/\\d+)?$") && method.equals(HttpMethod.GET.toString())) ||
                 path.matches("^/api-docs(/.*)?$");
     }
 }

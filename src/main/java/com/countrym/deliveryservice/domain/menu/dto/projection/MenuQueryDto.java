@@ -4,15 +4,15 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
-public class MenuDto {
-    private final Long menuId;
+public class MenuQueryDto {
+    private final long menuId;
     private final String name;
     private final String thumbnailUrl;
     private final String details;
-    private final Integer price;
+    private final int price;
 
     @QueryProjection
-    public MenuDto(long menuId, String name, String thumbnailUrl, String details, int price) {
+    public MenuQueryDto(long menuId, String name, String thumbnailUrl, String details, int price) {
         this.menuId = menuId;
         this.name = name;
         this.thumbnailUrl = thumbnailUrl;

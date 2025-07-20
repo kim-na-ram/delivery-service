@@ -26,6 +26,14 @@ public enum Authority implements BaseEnum {
         return isOwner ? OWNER : USER;
     }
 
+    public boolean isOwner() {
+        return this == OWNER;
+    }
+
+    public boolean isUser() {
+        return this == USER;
+    }
+
     public static Authority of(String role) {
         return Arrays.stream(Authority.values())
                 .filter(r -> r.name().equalsIgnoreCase(role))

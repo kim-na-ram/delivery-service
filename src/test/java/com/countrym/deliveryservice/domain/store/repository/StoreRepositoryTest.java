@@ -1,6 +1,7 @@
 package com.countrym.deliveryservice.domain.store.repository;
 
 import com.countrym.deliveryservice.common.config.spring.JPAConfig;
+import com.countrym.deliveryservice.common.config.util.SnowflakeIdConfig;
 import com.countrym.deliveryservice.domain.menu.entity.Menu;
 import com.countrym.deliveryservice.domain.menu.repository.MenuRepository;
 import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(JPAConfig.class)
+@Import({JPAConfig.class, SnowflakeIdConfig.class})
 @ExtendWith(SpringExtension.class)
 class StoreRepositoryTest {
     @Autowired
@@ -105,7 +106,7 @@ class StoreRepositoryTest {
 
             // then
             assertNotNull(storeMenuListDto);
-            assertTrue(storeMenuListDto.getMenuList().stream().noneMatch(menuDto -> menuDto.getMenuId().equals(deleteMenu.getId())));
+            assertTrue(storeMenuListDto.getMenuList().stream().noneMatch(menuDto -> menuDto.getMenuId() == deleteMenu.getId()));
         }
     }
 
@@ -126,8 +127,9 @@ class StoreRepositoryTest {
                 Store store = Store.from(owner, getRegisterStoreRequestDto());
                 ReflectionTestUtils.setField(store, "name", "store number " + i);
                 ReflectionTestUtils.setField(store, "type", StoreType.values()[i % StoreType.values().length]);
+                ReflectionTestUtils.setField(store, "totalOrderCount", new Random().nextInt(100, 2009));
                 ReflectionTestUtils.setField(store, "averageRating", new Random().nextInt(0, 11) * 0.5);
-                ReflectionTestUtils.setField(store, "reviewAmount", new Random().nextInt(0, 101));
+                ReflectionTestUtils.setField(store, "totalReviewCount", new Random().nextInt(0, 100));
                 storeList.add(store);
             }
 
@@ -175,11 +177,11 @@ class StoreRepositoryTest {
 
         @Test
         @DisplayName("별점 높은 순으로 정렬 성공")
-        public void findStoreListWithSorting() {
+        public void findStoreListWithAverageRatingSorting() {
             // given
             storeList.sort((o1, o2) -> {
                 if (o1.getAverageRating() == o2.getAverageRating()) {
-                    return o2.getReviewAmount() - o1.getReviewAmount();
+                    return o2.getTotalReviewCount() - o1.getTotalReviewCount();
                 }
 
                 int result;
@@ -190,6 +192,28 @@ class StoreRepositoryTest {
             });
 
             PageRequest pageRequest = PageRequest.of(0, listSize, Sort.by(StoreSortType.HIGH_AVERAGE_RATING.name()));
+
+            // when
+            List<GetStoreListResponseDto> sortedList = storeRepository.findAllByTypeAndNameByPaging(null, null, pageRequest);
+
+            // then
+            assertEquals(sortedList.stream().map(GetStoreListResponseDto::getStoreId).toList(), storeList.stream().map(Store::getId).toList());
+        }
+
+        @Test
+        @DisplayName("주문 많은 순으로 정렬 성공")
+        public void findStoreListWithOrderSorting() {
+            // given
+            storeList.sort((o1, o2) -> {
+                if (o1.getTotalOrderCount() == o2.getTotalOrderCount()) {
+                    if (o1.getAverageRating() > o2.getAverageRating()) return -1;
+                    else return 1;
+                }
+
+                return o2.getTotalOrderCount() - o1.getTotalOrderCount();
+            });
+
+            PageRequest pageRequest = PageRequest.of(0, listSize, Sort.by(StoreSortType.MANY_ORDERS.name()));
 
             // when
             List<GetStoreListResponseDto> sortedList = storeRepository.findAllByTypeAndNameByPaging(null, null, pageRequest);

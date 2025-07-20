@@ -1,6 +1,6 @@
 package com.countrym.deliveryservice.domain.store.repository;
 
-import com.countrym.deliveryservice.domain.menu.dto.projection.QMenuDto;
+import com.countrym.deliveryservice.domain.menu.dto.projection.QMenuQueryDto;
 import com.countrym.deliveryservice.domain.store.dto.projection.QStoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.response.GetStoreListResponseDto;
@@ -28,6 +28,7 @@ import static com.countrym.deliveryservice.domain.menu.entity.QMenu.menu;
 import static com.countrym.deliveryservice.domain.store.entity.QStore.store;
 import static com.countrym.deliveryservice.domain.store.enums.StoreSortType.HIGH_AVERAGE_RATING;
 import static com.countrym.deliveryservice.domain.store.enums.StoreSortType.MANY_ORDERS;
+import static com.countrym.deliveryservice.domain.user.entity.QUser.user;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 
@@ -37,12 +38,25 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public boolean existsOpenedStoreByOwnerId(long ownerId) {
+        return jpaQueryFactory
+                .from(store)
+                .join(store.owner, user)
+                .where(
+                        user.id.eq(ownerId),
+                        store.deletedAt.isNull()
+                )
+                .fetchOne() != null;
+    }
+
+    @Override
     public Optional<StoreMenuListDto> findByIdWithMenuList(long storeId) {
         Map<Long, StoreMenuListDto> result = jpaQueryFactory
                 .from(store)
                 .leftJoin(store.menuList, menu)
                 .where(
                         store.id.eq(storeId),
+                        store.deletedAt.isNull(),
                         menu.deletedAt.isNull()
                 )
                 .transform(
@@ -57,10 +71,11 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
                                                 store.openAt,
                                                 store.closedAt,
                                                 store.minOrderPrice,
+                                                store.totalOrderCount,
                                                 store.averageRating,
-                                                store.reviewAmount,
+                                                store.totalReviewCount,
                                                 list(
-                                                        new QMenuDto(
+                                                        new QMenuQueryDto(
                                                                 menu.id,
                                                                 menu.name,
                                                                 menu.thumbnailUrl,
@@ -72,7 +87,7 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
                                 )
                 );
 
-        if(result.isEmpty()) return Optional.empty();
+        if (result.isEmpty()) return Optional.empty();
         else return Optional.of(result.get(result.keySet().iterator().next()));
     }
 
@@ -86,12 +101,14 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
                                 store.openAt,
                                 store.closedAt,
                                 store.minOrderPrice,
+                                store.totalOrderCount,
                                 store.averageRating,
-                                store.reviewAmount
+                                store.totalReviewCount
                         )
                 )
                 .from(store)
                 .where(
+                        store.deletedAt.isNull(),
                         storeTypeEquals(type),
                         storeNameEquals(name)
                 )
@@ -118,16 +135,15 @@ public class StoreQueryRepositoryImpl implements StoreQueryRepository {
             PathBuilder<Store> path = new PathBuilder<>(Store.class, "store");
 
             if (property.equals(MANY_ORDERS.name())) {
-                // TODO 주문 많은 순 구현
-                NumberPath<Integer> ordersPath = path.getNumber("", Integer.class);
+                NumberPath<Integer> ordersPath = path.getNumber("totalOrderCount", Integer.class);
                 orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, ordersPath));
                 NumberPath<Double> averageRatingPath = path.getNumber("averageRating", Double.class);
                 orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, averageRatingPath));
             } else if (property.equals(HIGH_AVERAGE_RATING.name())) {
                 NumberPath<Double> averageRatingPath = path.getNumber("averageRating", Double.class);
                 orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, averageRatingPath));
-                NumberPath<Integer> reviewAmountPath = path.getNumber("reviewAmount", Integer.class);
-                orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, reviewAmountPath));
+                NumberPath<Integer> totalReviewCountPath = path.getNumber("totalReviewCount", Integer.class);
+                orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, totalReviewCountPath));
             } else {
                 orderSpecifiers.add(new OrderSpecifier(order, path.get(property)));
             }

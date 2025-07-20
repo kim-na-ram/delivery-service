@@ -17,8 +17,9 @@ public class GetStoreListResponseDto {
     private String thumbnailUrl;
     private boolean openStatus;
     private int minOrderPrice;
+    private int totalOrderCount;
     private double averageRating;
-    private int reviewAmount;
+    private int totalReviewCount;
 
     @QueryProjection
     public GetStoreListResponseDto(
@@ -28,16 +29,18 @@ public class GetStoreListResponseDto {
             LocalTime openAt,
             LocalTime closedAt,
             int minOrderPrice,
+            int totalOrderCount,
             double averageRating,
-            int reviewAmount
+            int totalReviewCount
     ) {
         this.storeId = storeId;
         this.name = name;
         this.thumbnailUrl = thumbnailUrl;
         this.openStatus = checkIsOpen(LocalTime.now(), openAt, closedAt);
         this.minOrderPrice = minOrderPrice;
+        this.totalOrderCount = totalOrderCount;
         this.averageRating = averageRating;
-        this.reviewAmount = reviewAmount;
+        this.totalReviewCount = totalReviewCount;
     }
 
     private boolean checkIsOpen(LocalTime now, LocalTime openAt, LocalTime closedAt) {

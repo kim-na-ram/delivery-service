@@ -12,7 +12,7 @@ import com.countrym.deliveryservice.domain.store.dto.response.ModifyStoreRespons
 import com.countrym.deliveryservice.domain.store.dto.response.RegisterStoreResponseDto;
 import com.countrym.deliveryservice.domain.store.entity.Store;
 import com.countrym.deliveryservice.domain.store.enums.StoreType;
-import com.countrym.deliveryservice.domain.store.repository.StoreRepository;
+import com.countrym.deliveryservice.domain.store.facade.StoreFacade;
 import com.countrym.deliveryservice.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,32 +22,31 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static com.countrym.deliveryservice.common.exception.ResponseCode.ALREADY_EXISTS_STORE_ERROR;
-import static com.countrym.deliveryservice.common.exception.ResponseCode.INVALID_STORE_OWNER;
+import static com.countrym.deliveryservice.common.exception.ResponseCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
-    private final StoreRepository storeRepository;
+    private final StoreFacade storeFacade;
 
     @Transactional
     public RegisterStoreResponseDto registerStore(UserInfo userInfo, RegisterStoreRequestDto registerStoreRequestDto) {
         validateStoreName(registerStoreRequestDto.getName());
 
-        Store store = storeRepository.save(Store.from(User.from(userInfo), registerStoreRequestDto));
+        Store store = storeFacade.saveStore(Store.from(User.from(userInfo), registerStoreRequestDto));
 
         return RegisterStoreResponseDto.from(store);
     }
 
     @Transactional(readOnly = true)
     public GetStoreResponseDto getStore(long storeId) {
-        StoreMenuListDto storeMenuListDto = storeRepository.findByStoreIdWithMenuList(storeId);
+        StoreMenuListDto storeMenuListDto = storeFacade.getStoreWithMenuList(storeId);
         return GetStoreResponseDto.from(storeMenuListDto);
     }
 
     @Transactional(readOnly = true)
     public List<GetStoreListResponseDto> getStoreList(String type, String name, Pageable pageable) {
-        return storeRepository.findAllByTypeAndNameByPaging(
+        return storeFacade.getStoreByPaging(
                 StringUtils.hasText(type) ? StoreType.of(type) : null,
                 name,
                 pageable
@@ -56,7 +55,7 @@ public class StoreService {
 
     @Transactional
     public ModifyStoreResponseDto modifyStore(long storeId, UserInfo userInfo, ModifyStoreRequestDto modifyStoreRequestDto) {
-        Store store = storeRepository.findByStoreId(storeId);
+        Store store = storeFacade.getStore(storeId);
         validateUserOwnStore(userInfo.getId(), store);
 
         if (StringUtils.hasText(modifyStoreRequestDto.getName())) {
@@ -65,7 +64,7 @@ public class StoreService {
         }
 
         store.modify(modifyStoreRequestDto);
-        storeRepository.save(store);
+        storeFacade.saveStore(store);
 
         return ModifyStoreResponseDto.from(store);
     }
@@ -76,19 +75,22 @@ public class StoreService {
     }
 
     private void validateStoreName(String name) {
-        if (storeRepository.existsByName(name)) {
+        if (storeFacade.existsByName(name)) {
             throw new DuplicateElementException(ALREADY_EXISTS_STORE_ERROR);
         }
     }
 
     @Transactional
     public void closureStore(long storeId, UserInfo userInfo) {
-        Store store = storeRepository.findByStoreId(storeId);
+        Store store = storeFacade.getStore(storeId);
         validateUserOwnStore(userInfo.getId(), store);
 
-        // TODO 주문이 있다면 폐업 불가능
+        // 주문이 있다면 폐업 불가능
+        if (storeFacade.existUncompletedOrderInStore(storeId)) {
+            throw new InvalidParameterException(INVALID_UNCOMPLETED_ORDER_IN_STORE);
+        }
 
         store.closure();
-        storeRepository.save(store);
+        storeFacade.saveStore(store);
     }
 }

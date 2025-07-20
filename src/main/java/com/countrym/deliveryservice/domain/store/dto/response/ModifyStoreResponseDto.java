@@ -21,8 +21,9 @@ public class ModifyStoreResponseDto {
     private LocalTime openAt;
     private LocalTime closedAt;
     private int minOrderPrice;
+    private int totalOrderCount;
     private double averageRating;
-    private int reviewAmount;
+    private int totalReviewCount;
 
     public static ModifyStoreResponseDto from(Store store) {
         return new ModifyStoreResponseDto(
@@ -35,8 +36,9 @@ public class ModifyStoreResponseDto {
                 store.getOpenAt(),
                 store.getClosedAt(),
                 store.getMinOrderPrice(),
+                store.getTotalOrderCount(),
                 store.getAverageRating(),
-                store.getReviewAmount()
+                store.getTotalReviewCount()
         );
     }
 }

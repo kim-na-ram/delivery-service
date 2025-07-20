@@ -24,8 +24,8 @@ public class StoreMockData {
                 "address1",
                 "address2",
                 StoreType.CAFE.name(),
-                LocalTime.of(10, 0),
-                LocalTime.of(22, 0),
+                LocalTime.of(LocalTime.now().minusHours(2).getHour(), 0),
+                LocalTime.of(LocalTime.now().plusHours(2).getHour(), 0),
                 10000
         );
     }
@@ -68,7 +68,7 @@ public class StoreMockData {
     public static Store getStoreWithMenuList() {
         Store store = Store.from(User.from(getOwnerInfo()), getRegisterStoreRequestDto());
         ReflectionTestUtils.setField(store, "id", 1L);
-        ReflectionTestUtils.setField(store, "menuList", getMenuList(5));
+        ReflectionTestUtils.setField(store, "menuList", getMenuList(null));
 
         return store;
     }
@@ -83,6 +83,7 @@ public class StoreMockData {
                 LocalTime.of(10, 0),
                 LocalTime.of(20, 0),
                 10000,
+                5,
                 5.0,
                 3,
                 getMenuDtoList(number)

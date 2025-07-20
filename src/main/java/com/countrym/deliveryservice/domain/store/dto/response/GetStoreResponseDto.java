@@ -24,8 +24,9 @@ public class GetStoreResponseDto {
     private LocalTime openAt;
     private LocalTime closedAt;
     private int minOrderPrice;
+    private int totalOrderCount;
     private double averageRating;
-    private int reviewAmount;
+    private int totalReviewCount;
     private List<GetMenuResponseDto> menuList;
 
     public static GetStoreResponseDto from(Store store) {
@@ -38,8 +39,9 @@ public class GetStoreResponseDto {
                 store.getOpenAt(),
                 store.getClosedAt(),
                 store.getMinOrderPrice(),
+                store.getTotalOrderCount(),
                 store.getAverageRating(),
-                store.getReviewAmount(),
+                store.getTotalReviewCount(),
                 store.getMenuList().stream().map(GetMenuResponseDto::from).toList()
         );
     }
@@ -54,8 +56,9 @@ public class GetStoreResponseDto {
                 storeMenuListDto.getOpenAt(),
                 storeMenuListDto.getClosedAt(),
                 storeMenuListDto.getMinOrderPrice(),
+                storeMenuListDto.getTotalOrderCount(),
                 storeMenuListDto.getAverageRating(),
-                storeMenuListDto.getReviewAmount(),
+                storeMenuListDto.getTotalReviewCount(),
                 storeMenuListDto.getMenuList().stream()
                         .filter(menuDto -> StringUtils.hasText(menuDto.getName()))
                         .map(GetMenuResponseDto::from).toList()

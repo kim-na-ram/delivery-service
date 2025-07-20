@@ -1,14 +1,15 @@
 package com.countrym.deliveryservice.domain.store.dto.projection;
 
-import com.countrym.deliveryservice.domain.menu.dto.projection.MenuDto;
+import com.countrym.deliveryservice.domain.menu.dto.projection.MenuQueryDto;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.List;
 
 @Getter
+@RequiredArgsConstructor
 public class StoreMenuListDto {
     private String name;
     private String thumbnailUrl;
@@ -18,9 +19,10 @@ public class StoreMenuListDto {
     private LocalTime openAt;
     private LocalTime closedAt;
     private int minOrderPrice;
+    private int totalOrderCount;
     private double averageRating;
-    private int reviewAmount;
-    private List<MenuDto> menuList;
+    private int totalReviewCount;
+    private List<MenuQueryDto> menuList;
 
     @QueryProjection
     public StoreMenuListDto(
@@ -32,9 +34,10 @@ public class StoreMenuListDto {
             LocalTime openAt,
             LocalTime closedAt,
             int minOrderPrice,
+            int totalOrderCount,
             double averageRating,
-            int reviewAmount,
-            List<MenuDto> menuList
+            int totalReviewCount,
+            List<MenuQueryDto> menuList
     ) {
         this.name = name;
         this.thumbnailUrl = thumbnailUrl;
@@ -44,8 +47,9 @@ public class StoreMenuListDto {
         this.openAt = openAt;
         this.closedAt = closedAt;
         this.minOrderPrice = minOrderPrice;
+        this.totalOrderCount = totalOrderCount;
         this.averageRating = averageRating;
-        this.reviewAmount = reviewAmount;
+        this.totalReviewCount = totalReviewCount;
         this.menuList = menuList;
     }
 }

@@ -13,6 +13,26 @@ public class UserMockData {
         return UserInfo.of(2L, Authority.OWNER);
     }
 
+    public static SignUpRequestDto getUserSignUpRequestDto() {
+        return new SignUpRequestDto(
+                "user@google.com",
+                "user123",
+                "user",
+                "user",
+                false
+        );
+    }
+
+    public static SignUpRequestDto getUserSignUpRequestDto(String email) {
+        return new SignUpRequestDto(
+                email,
+                "user123",
+                "user",
+                "user",
+                false
+        );
+    }
+
     public static SignUpRequestDto getOwnerSignUpRequestDto() {
         return new SignUpRequestDto(
                 "owner@google.com",

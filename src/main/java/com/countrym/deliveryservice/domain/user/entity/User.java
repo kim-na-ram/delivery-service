@@ -48,6 +48,10 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    private User(long id) {
+        this.id = id;
+    }
+
     private User(
             long id,
             Authority authority
@@ -69,6 +73,10 @@ public class User {
         this.nickname = nickname;
         this.grade = Grade.BRONZE;
         this.authority = Authority.from(isOwner);
+    }
+
+    public static User of(long userId) {
+        return new User(userId);
     }
 
     public static User from(UserInfo userInfo) {

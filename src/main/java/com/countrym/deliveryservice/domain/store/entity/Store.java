@@ -1,6 +1,7 @@
 package com.countrym.deliveryservice.domain.store.entity;
 
 import com.countrym.deliveryservice.domain.menu.entity.Menu;
+import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.request.ModifyStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.dto.request.RegisterStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.enums.StoreType;
@@ -69,8 +70,12 @@ public class Store {
     private double averageRating;
 
     @NotNull
-    @Column(name = "review_amount")
-    private int reviewAmount;
+    @Column(name = "total_review_count")
+    private int totalReviewCount;
+
+    @NotNull
+    @Column(name = "total_order_count")
+    private int totalOrderCount;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -96,7 +101,8 @@ public class Store {
         this.closedAt = closedAt;
         this.minOrderPrice = minOrderPrice;
         this.averageRating = 0.0;
-        this.reviewAmount = 0;
+        this.totalReviewCount = 0;
+        this.totalOrderCount = 0;
     }
 
     private Store(long storeId) {
@@ -134,6 +140,22 @@ public class Store {
         if (modifyStoreRequestDto.getClosedAt() != null) this.closedAt = modifyStoreRequestDto.getClosedAt();
         if (modifyStoreRequestDto.getMinOrderPrice() != null)
             this.minOrderPrice = modifyStoreRequestDto.getMinOrderPrice();
+    }
+
+    public void plusTotalOrderCount(int orderCount) {
+        this.totalOrderCount += orderCount;
+    }
+
+    public void minusTotalOrderCount(int orderCount) {
+        this.totalOrderCount -= orderCount;
+    }
+
+    public void plusTotalReviewCount(int reviewCount) {
+        this.totalReviewCount += reviewCount;
+    }
+
+    public void minusTotalReviewCount(int reviewCount) {
+        this.totalReviewCount -= reviewCount;
     }
 
     public void closure() {

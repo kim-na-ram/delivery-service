@@ -35,8 +35,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//    // redis
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//    implementation 'org.redisson:redisson-spring-boot-starter:3.18.0'
 
     // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'

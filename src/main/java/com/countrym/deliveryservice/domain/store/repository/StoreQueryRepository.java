@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StoreQueryRepository {
+    boolean existsOpenedStoreByOwnerId(long ownerId);
     Optional<StoreMenuListDto> findByIdWithMenuList(long storeId);
     List<GetStoreListResponseDto> findAllByTypeAndNameByPaging(StoreType type, String name, Pageable pageable);
 }

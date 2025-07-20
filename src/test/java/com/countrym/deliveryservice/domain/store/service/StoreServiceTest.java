@@ -10,7 +10,7 @@ import com.countrym.deliveryservice.domain.store.dto.response.GetStoreResponseDt
 import com.countrym.deliveryservice.domain.store.dto.response.ModifyStoreResponseDto;
 import com.countrym.deliveryservice.domain.store.dto.response.RegisterStoreResponseDto;
 import com.countrym.deliveryservice.domain.store.entity.Store;
-import com.countrym.deliveryservice.domain.store.repository.StoreRepository;
+import com.countrym.deliveryservice.domain.store.facade.StoreFacade;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static com.countrym.deliveryservice.common.exception.ResponseCode.INVALID_UNCOMPLETED_ORDER_IN_STORE;
 import static com.countrym.deliveryservice.domain.data.store.StoreMockData.*;
 import static com.countrym.deliveryservice.domain.data.user.UserMockData.getOwnerInfo;
 import static com.countrym.deliveryservice.domain.data.user.UserMockData.getUserInfo;
@@ -29,14 +30,14 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
     @Mock
-    private StoreRepository storeRepository;
+    private StoreFacade storeFacade;
 
     @InjectMocks
     private StoreService storeService;
 
     @Nested
     @DisplayName("상점 등록")
-    class registerStore {
+    class RegisterStore {
         @Test
         @DisplayName("이미 존재하는 상점명일 경우 상점 등록에 실패")
         public void registerStore_duplicateStoreName_failure() {
@@ -44,7 +45,7 @@ class StoreServiceTest {
             UserInfo userInfo = getOwnerInfo();
             RegisterStoreRequestDto registerStoreRequestDto = getRegisterStoreRequestDto();
 
-            given(storeRepository.existsByName(anyString())).willReturn(true);
+            given(storeFacade.existsByName(anyString())).willReturn(true);
 
             // when, then
             assertThrows(DuplicateElementException.class,
@@ -60,8 +61,8 @@ class StoreServiceTest {
 
             Store store = getStore(userInfo, registerStoreRequestDto);
 
-            given(storeRepository.existsByName(anyString())).willReturn(false);
-            given(storeRepository.save(any(Store.class))).willReturn(store);
+            given(storeFacade.existsByName(anyString())).willReturn(false);
+            given(storeFacade.saveStore(any(Store.class))).willReturn(store);
 
             // when
             RegisterStoreResponseDto registerStoreResponseDto = storeService.registerStore(userInfo, registerStoreRequestDto);
@@ -73,15 +74,15 @@ class StoreServiceTest {
 
     @Nested
     @DisplayName("상점 조회")
-    class getStore {
+    class GetStore {
         @Test
-        @DisplayName("상점 조회 시, 메뉴가 없을 경우 메뉴가 빈 리스트로 표시")
+        @DisplayName("메뉴가 없을 경우 메뉴가 빈 리스트로 표시")
         public void getStore_menuListIsEmpty() {
             // given
             long storeId = 1L;
             StoreMenuListDto storeMenuListDto = getStoreMenuListDto(0);
 
-            given(storeRepository.findByStoreIdWithMenuList(storeId)).willReturn(storeMenuListDto);
+            given(storeFacade.getStoreWithMenuList(anyLong())).willReturn(storeMenuListDto);
 
             // when
             GetStoreResponseDto getStoreResponseDto = storeService.getStore(storeId);
@@ -98,7 +99,7 @@ class StoreServiceTest {
             long storeId = 1L;
             StoreMenuListDto storeMenuListDto = getStoreMenuListDto(5);
 
-            given(storeRepository.findByStoreIdWithMenuList(storeId)).willReturn(storeMenuListDto);
+            given(storeFacade.getStoreWithMenuList(anyLong())).willReturn(storeMenuListDto);
 
             // when
             GetStoreResponseDto getStoreResponseDto = storeService.getStore(storeId);
@@ -111,10 +112,10 @@ class StoreServiceTest {
 
     @Nested
     @DisplayName("상점 수정")
-    class modifyStore {
+    class ModifyStore {
         @Test
-        @DisplayName("유저가 해당 가게의 점주가 아닐 경우 상점 수정에 실패")
-        public void modifyStore_storeNotFound_failure() {
+        @DisplayName("사용자가 해당 가게의 점주가 아닐 경우 상점 수정에 실패")
+        public void modifyStore_userIsNotStoreOwner_failure() {
             // given
             long storeId = 1L;
             UserInfo userInfo = getOwnerInfo();
@@ -122,7 +123,7 @@ class StoreServiceTest {
 
             Store store = getStore(getUserInfo());
 
-            given(storeRepository.findByStoreId(anyLong())).willReturn(store);
+            given(storeFacade.getStore(anyLong())).willReturn(store);
 
             // when, then
             assertThrows(InvalidParameterException.class,
@@ -139,8 +140,8 @@ class StoreServiceTest {
 
             Store store = getStore(getOwnerInfo());
 
-            given(storeRepository.findByStoreId(anyLong())).willReturn(store);
-            given(storeRepository.existsByName(anyString())).willReturn(true);
+            given(storeFacade.getStore(anyLong())).willReturn(store);
+            given(storeFacade.existsByName(anyString())).willReturn(true);
 
             // when, then
             assertThrows(DuplicateElementException.class,
@@ -158,8 +159,8 @@ class StoreServiceTest {
             Store store = getStore(getOwnerInfo());
             String prvStoreName = store.getName();
 
-            given(storeRepository.findByStoreId(anyLong())).willReturn(store);
-            given(storeRepository.existsByName(anyString())).willReturn(false);
+            given(storeFacade.getStore(anyLong())).willReturn(store);
+            given(storeFacade.existsByName(anyString())).willReturn(false);
 
             // when
             ModifyStoreResponseDto modifyStoreResponseDto = storeService.modifyStore(storeId, userInfo, modifyStoreRequestDto);
@@ -168,6 +169,61 @@ class StoreServiceTest {
             assertEquals(modifyStoreResponseDto.getStoreId(), store.getId());
             assertEquals(modifyStoreRequestDto.getName(), modifyStoreResponseDto.getName());
             assertNotEquals(modifyStoreResponseDto.getName(), prvStoreName);
+        }
+    }
+
+    @Nested
+    @DisplayName("상점 폐업")
+    class ClosureStore {
+        @Test
+        @DisplayName("사용자가 해당 가게의 점주가 아닐 경우 상점 폐업에 실패")
+        public void closureStore_userIsNotStoreOwner_failure() {
+            // given
+            long storeId = 1L;
+            UserInfo userInfo = getOwnerInfo();
+
+            Store store = getStore(getUserInfo());
+
+            given(storeFacade.getStore(anyLong())).willReturn(store);
+
+            // when, then
+            assertThrows(InvalidParameterException.class, () -> storeService.closureStore(storeId, userInfo));
+        }
+
+        @Test
+        @DisplayName("완료되지 않은 주문이 있어 상점 폐업에 실패")
+        public void closureStore_uncompletedOrderExists_failure() {
+            // given
+            long storeId = 1L;
+            UserInfo userInfo = getOwnerInfo();
+
+            Store store = getStore(userInfo);
+
+            given(storeFacade.getStore(anyLong())).willReturn(store);
+            given(storeFacade.existUncompletedOrderInStore(anyLong())).willReturn(true);
+
+            // when
+            Throwable t = assertThrows(InvalidParameterException.class, () -> storeService.closureStore(storeId, userInfo));
+
+            // then
+            assertEquals(INVALID_UNCOMPLETED_ORDER_IN_STORE.getMessage(), t.getMessage());
+        }
+
+        @Test
+        @DisplayName("성공")
+        public void closureStore_success() {
+            // given
+            long storeId = 1L;
+            UserInfo userInfo = getOwnerInfo();
+
+            Store store = getStore(userInfo);
+
+            given(storeFacade.getStore(anyLong())).willReturn(store);
+            given(storeFacade.existUncompletedOrderInStore(anyLong())).willReturn(false);
+
+            // when, then
+            assertDoesNotThrow(() -> storeService.closureStore(storeId, userInfo));
+            assertNotNull(store.getDeletedAt());
         }
     }
 }
