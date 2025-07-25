@@ -5,6 +5,7 @@ import com.countrym.deliveryservice.domain.menu.entity.Menu;
 import com.countrym.deliveryservice.domain.order.dto.request.OrderRequestDto;
 import com.countrym.deliveryservice.domain.order.enums.OrderStatus;
 import com.countrym.deliveryservice.domain.order.enums.PaymentMethod;
+import com.countrym.deliveryservice.domain.review.entity.Review;
 import com.countrym.deliveryservice.domain.store.entity.Store;
 import com.countrym.deliveryservice.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -58,6 +59,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<OrderedMenu> orderedMenuList = new ArrayList<>();
 
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    private Review review;
+
     private Order(long orderId) {
         this.id = orderId;
     }
@@ -70,6 +74,7 @@ public class Order {
         this.paymentMethod = paymentMethod;
         this.orderedAt = orderedAt;
         this.orderedMenuList = new ArrayList<>();
+//        this.review = null;
     }
 
     public static Order of(long orderId) {
@@ -101,5 +106,4 @@ public class Order {
         this.canceledAt = LocalDateTime.now();
         this.status = OrderStatus.CANCELED;
     }
-
 }

@@ -44,6 +44,10 @@ public enum OrderStatus implements BaseEnum {
         return status == OrderStatus.PENDING_ACCEPTANCE;
     }
 
+    public static boolean isCompleted(OrderStatus status) {
+        return status == OrderStatus.DELIVERY_COMPLETED;
+    }
+
     public static boolean isNextStep(OrderStatus status, OrderStatus nextStatus) {
         return status.getStep() < nextStatus.getStep();
     }

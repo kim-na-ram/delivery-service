@@ -1,7 +1,6 @@
 package com.countrym.deliveryservice.domain.store.entity;
 
 import com.countrym.deliveryservice.domain.menu.entity.Menu;
-import com.countrym.deliveryservice.domain.store.dto.projection.StoreMenuListDto;
 import com.countrym.deliveryservice.domain.store.dto.request.ModifyStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.dto.request.RegisterStoreRequestDto;
 import com.countrym.deliveryservice.domain.store.enums.StoreType;
@@ -66,6 +65,10 @@ public class Store {
     private int minOrderPrice;
 
     @NotNull
+    @Column(name = "total_rating")
+    private double totalRating;
+
+    @NotNull
     @Column(name = "average_rating")
     private double averageRating;
 
@@ -100,6 +103,7 @@ public class Store {
         this.openAt = openAt;
         this.closedAt = closedAt;
         this.minOrderPrice = minOrderPrice;
+        this.totalRating = 0.0;
         this.averageRating = 0.0;
         this.totalReviewCount = 0;
         this.totalOrderCount = 0;
@@ -150,12 +154,16 @@ public class Store {
         this.totalOrderCount -= orderCount;
     }
 
-    public void plusTotalReviewCount(int reviewCount) {
+    public void registeredReview(double rating, int reviewCount) {
+        this.totalRating += rating;
         this.totalReviewCount += reviewCount;
+        this.averageRating = (Math.floor(this.totalRating * 100 / this.totalReviewCount)) / 100.0;
     }
 
-    public void minusTotalReviewCount(int reviewCount) {
+    public void deletedReview(double rating, int reviewCount) {
+        this.totalRating -= rating;
         this.totalReviewCount -= reviewCount;
+        this.averageRating = (Math.floor(this.totalRating * 100 / this.totalReviewCount)) / 100.0;
     }
 
     public void closure() {

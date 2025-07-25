@@ -150,7 +150,7 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<StoreOrderListResponseDto> getOrderListWithStore(UserInfo userInfo, long storeId, String status, Pageable pageable) {
+    public List<StoreOrderListResponseDto> getStoreOrderList(UserInfo userInfo, long storeId, String status, Pageable pageable) {
         List<StoreOrderQueryDto> storeOrderDtoList =
                 orderFacade.getStoreOrderList(storeId, stringStatusToOrderStatus(status), pageable);
 

@@ -48,7 +48,14 @@ public enum ResponseCode {
     INVALID_CHANGE_ORDER_STATUS_TO_CANCEL("주문 상태 변경으로는 주문 취소를 할 수 없습니다."),
     INVALID_CANCEL_ORDER_FOR_USER("주문 취소는 주문이 수락되기 전에만 가능합니다."),
     INVALID_CANCEL_ORDER_FOR_OWNER("주문 취소는 주문을 수락하기 전에만 가능합니다."),
-    ALREADY_CANCELED_ORDER_ERROR("이미 취소된 주문입니다");
+    ALREADY_CANCELED_ORDER_ERROR("이미 취소된 주문입니다"),
+
+    // review
+    NOT_FOUND_REVIEW("해당 리뷰는 존재하지 않습니다."),
+    INVALID_REVIEW_NOT_COMPLETED_ORDER("배달 완료된 주문 건에 대해서만 리뷰를 작성할 수 있습니다."),
+    INVALID_REVIEW_ORDER_DATE_OVER_THREE_DAYS("주문일로부터 3일이 지나면 리뷰를 작성할 수 없습니다."),
+    ALREADY_REVIEWED_ORDER_ERROR("이미 작성된 리뷰가 존재합니다."),
+    ;
 
     private final String message;
 }

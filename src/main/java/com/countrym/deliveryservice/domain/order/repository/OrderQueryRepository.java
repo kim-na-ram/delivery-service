@@ -1,9 +1,6 @@
 package com.countrym.deliveryservice.domain.order.repository;
 
-import com.countrym.deliveryservice.domain.order.dto.projection.OrderDetailQueryDto;
-import com.countrym.deliveryservice.domain.order.dto.projection.OrderQueryDto;
-import com.countrym.deliveryservice.domain.order.dto.projection.OrderSimpleQueryDto;
-import com.countrym.deliveryservice.domain.order.dto.projection.StoreOrderQueryDto;
+import com.countrym.deliveryservice.domain.order.dto.projection.*;
 import com.countrym.deliveryservice.domain.order.enums.OrderStatus;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +21,6 @@ public interface OrderQueryRepository {
     Optional<List<StoreOrderQueryDto>> findAllByStoreIdAndPaging(long storeId, OrderStatus orderStatus, Pageable pageable);
 
     Optional<OrderQueryDto> findById(long orderId);
+
+    Optional<OrderReviewQueryDto> findByIdAndReviewIsNull(long orderId);
 }

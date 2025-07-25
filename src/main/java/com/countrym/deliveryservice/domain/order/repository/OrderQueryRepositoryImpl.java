@@ -18,6 +18,7 @@ import java.util.Optional;
 import static com.countrym.deliveryservice.domain.menu.entity.QMenu.menu;
 import static com.countrym.deliveryservice.domain.order.entity.QOrder.order;
 import static com.countrym.deliveryservice.domain.order.entity.QOrderedMenu.orderedMenu;
+import static com.countrym.deliveryservice.domain.review.entity.QReview.review;
 import static com.countrym.deliveryservice.domain.store.entity.QStore.store;
 import static com.countrym.deliveryservice.domain.user.entity.QUser.user;
 import static com.querydsl.core.group.GroupBy.groupBy;
@@ -99,8 +100,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                                         order.status,
                                         order.orderedAt,
                                         order.canceledAt,
-                                        // TODO review 작성(존재)유무
-                                        Expressions.asBoolean(false)
+                                        order.review.isNotNull()
                                 )
                         )
                         .from(order)
@@ -130,8 +130,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                                         order.status,
                                         order.orderedAt,
                                         order.canceledAt,
-                                        // TODO review 작성(존재)유무
-                                        Expressions.asBoolean(false)
+                                        order.review.isNotNull()
                                 )
                         )
                         .from(order)
@@ -190,6 +189,24 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         .where(order.id.eq(orderId))
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()
+        );
+    }
+
+    public Optional<OrderReviewQueryDto> findByIdAndReviewIsNull(long orderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(new QOrderReviewQueryDto(
+                                order.user.id,
+                                order.store.id,
+                                order
+                        ))
+                        .from(order)
+                        .leftJoin(order.review, review)
+                        .where(
+                                order.id.eq(orderId),
+                                order.review.isNull()
+                        )
+                        .fetchFirst()
         );
     }
 

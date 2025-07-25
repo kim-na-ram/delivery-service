@@ -45,7 +45,7 @@ public class OrderController {
         return ResponseEntity.ok(SuccessResponse.of(orderResponseDto));
     }
 
-    @GetMapping("/orders")
+    @GetMapping("/users/orders")
     public ResponseEntity<SuccessResponse<List<OrderListResponseDto>>> getOrderList(
             @AuthenticationPrincipal UserInfo userInfo,
             @RequestParam(required = false) String status,
@@ -56,13 +56,13 @@ public class OrderController {
     }
 
     @GetMapping("/stores/{storeId}/orders")
-    public ResponseEntity<SuccessResponse<List<StoreOrderListResponseDto>>> getOrderListWithStoreId(
+    public ResponseEntity<SuccessResponse<List<StoreOrderListResponseDto>>> getStoreOrderList(
             @AuthenticationPrincipal UserInfo userInfo,
             @PathVariable("storeId") long storeId,
             @RequestParam(required = false) String status,
             @PageableDefault(size = 20, sort = "ordered_at", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        List<StoreOrderListResponseDto> storeOrderResponseDtoList = orderService.getOrderListWithStore(userInfo, storeId, status, pageable);
+        List<StoreOrderListResponseDto> storeOrderResponseDtoList = orderService.getStoreOrderList(userInfo, storeId, status, pageable);
         return ResponseEntity.ok(SuccessResponse.of(storeOrderResponseDtoList));
     }
 

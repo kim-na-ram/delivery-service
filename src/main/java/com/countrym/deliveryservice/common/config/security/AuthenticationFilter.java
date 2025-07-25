@@ -64,10 +64,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isExcludePath(String path, String method) {
-        return path.startsWith("/swagger-ui/") ||
+        boolean result = path.startsWith("/swagger-ui/") ||
                 path.equals("/api/auth/sign-up") ||
                 path.equals("/api/auth/sign-in") ||
-                (path.matches("^api/stores(?:/\\d+)?$") && method.equals(HttpMethod.GET.toString())) ||
+                (path.matches("^/api/stores(?:/\\d+(?:.*)?)?$") && method.equals(HttpMethod.GET.toString())) ||
+                (path.matches("^/api/stores(\\?.*)$") && method.equals(HttpMethod.GET.toString())) ||
                 path.matches("^/api-docs(/.*)?$");
+
+        return result;
     }
 }

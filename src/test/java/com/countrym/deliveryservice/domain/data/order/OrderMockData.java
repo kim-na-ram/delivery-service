@@ -6,7 +6,6 @@ import com.countrym.deliveryservice.domain.order.dto.request.OrderRequestDto;
 import com.countrym.deliveryservice.domain.order.entity.Order;
 import com.countrym.deliveryservice.domain.order.enums.OrderStatus;
 import com.countrym.deliveryservice.domain.order.enums.PaymentMethod;
-import com.countrym.deliveryservice.domain.store.entity.Store;
 import com.countrym.deliveryservice.domain.user.entity.User;
 
 import java.util.List;
@@ -29,6 +28,15 @@ public class OrderMockData {
                 List.of(getOrderMenuRequestDto()),
                 11000,
                 PaymentMethod.NAVER_PAY.name()
+        );
+    }
+
+    public static OrderRequestDto getOrderRequestDto(long storeId, long menuId, int quantity, int orderedPrice) {
+        return new OrderRequestDto(
+                storeId,
+                List.of(new OrderRequestDto.OrderMenuRequestDto(menuId, quantity)),
+                orderedPrice,
+                PaymentMethod.CARD.name()
         );
     }
 

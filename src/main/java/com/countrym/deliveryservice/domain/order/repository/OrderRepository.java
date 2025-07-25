@@ -2,24 +2,15 @@ package com.countrym.deliveryservice.domain.order.repository;
 
 import com.countrym.deliveryservice.common.exception.NotFoundException;
 import com.countrym.deliveryservice.common.exception.ResponseCode;
-import com.countrym.deliveryservice.domain.order.dto.projection.OrderDetailQueryDto;
-import com.countrym.deliveryservice.domain.order.dto.projection.OrderQueryDto;
-import com.countrym.deliveryservice.domain.order.dto.projection.OrderSimpleQueryDto;
-import com.countrym.deliveryservice.domain.order.dto.projection.StoreOrderQueryDto;
+import com.countrym.deliveryservice.domain.order.dto.projection.*;
 import com.countrym.deliveryservice.domain.order.entity.Order;
 import com.countrym.deliveryservice.domain.order.enums.OrderStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryRepository {
-//    default Order findByOrderId(long orderId) {
-//        return findById(orderId)
-//                .orElseThrow(() -> new NotFoundException(ResponseCode.NOT_FOUND_ORDER));
-//    }
-
     default OrderDetailQueryDto findByOrderIdWithMenuList(long orderId) {
         return findByIdWithMenuList(orderId)
                 .orElseThrow(() -> new NotFoundException(ResponseCode.NOT_FOUND_ORDER));
@@ -27,6 +18,11 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderQueryR
 
     default OrderQueryDto findByOrderId(long orderId) {
         return findById(orderId)
+                .orElseThrow(() -> new NotFoundException(ResponseCode.NOT_FOUND_ORDER));
+    }
+
+    default OrderReviewQueryDto findByOrderIdAndReviewIsNull(long orderId) {
+        return findByIdAndReviewIsNull(orderId)
                 .orElseThrow(() -> new NotFoundException(ResponseCode.NOT_FOUND_ORDER));
     }
 
